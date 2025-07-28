@@ -1,0 +1,19 @@
+//Programa com uso de leitura, função com chamada, e controle mais complexo bela Copiar código
+
+main() {
+    var float valor;
+    var float resultado;
+
+    valor = readInput();
+    resultado = calcular(valor, 2.0);
+
+    if resultado > 10.0 then {
+        printLn resultado;
+    };
+}
+
+fun float calcular(float x, float y) {
+    var float res;
+    res = x * y;
+    return res;
+}

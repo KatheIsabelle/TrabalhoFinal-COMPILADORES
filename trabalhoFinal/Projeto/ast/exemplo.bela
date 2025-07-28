@@ -1,0 +1,28 @@
+//Programa com variáveis, função, if, while, leitura e escrita
+
+main() {
+    var float x;
+    var bool flag;
+    
+    x = 0.0;
+    flag = true;
+    
+    while (x < 10.0) {
+        printLn x;
+        x = x + 1.0;
+    };
+    
+    if flag then {
+        printLn 42;
+    };
+}
+
+fun float soma(float a, float b) {
+    var float resultado;
+    resultado = a + b;
+    return resultado;
+}
+
+fun void printMessage() {
+    printLn 100;
+}
