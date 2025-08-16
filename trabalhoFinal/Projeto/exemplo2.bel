@@ -1,0 +1,16 @@
+main () {
+    var float teste;
+    var float cinco;
+    var float igual;
+    teste = 9.5;
+    cinco = 5;
+    igual = 101;
+    while(teste>0){
+        printLn teste;
+        if(teste == cinco) then{
+            printLn igual;
+        }
+        teste = ( teste - 1 );
+    }
+    printLn teste;
+}

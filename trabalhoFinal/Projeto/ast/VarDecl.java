@@ -11,6 +11,15 @@ public class VarDecl {
     }
 
     public void gerarCodigo(PrintWriter out) {
-        out.println(tipo + " " + var + ";");
+        // Cria uma variável para armazenar o tipo traduzido
+        String tipoJava = tipo;
+        
+        // Verifica se o tipo original é "bool" e o traduz para "boolean"
+        if (tipo.equals("bool")) {
+            tipoJava = "boolean";
+        }
+        
+        // Usa o tipo traduzido para gerar o código
+        out.println(tipoJava + " " + var + ";");
     }
 }

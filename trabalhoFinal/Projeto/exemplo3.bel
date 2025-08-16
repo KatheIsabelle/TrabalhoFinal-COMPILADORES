@@ -1,0 +1,32 @@
+main () {
+    var float var_a;
+    var float var_b;
+    var float result;
+    var bool flag;
+
+    var_a = 666;
+    var_b = 777;
+
+    result = soma(var_a, var_b);
+    printLn result;
+
+    result = div(var_a, var_b);
+    if(result<10) then{
+         flag = true;
+    }
+    printaZebra(result);
+    
+}
+fun float soma(float a, float b){
+    var float c;
+    c =  (a + b);
+    return c;
+}
+fun float div(float a, float b){
+    var float c;
+    c =  (a / b);
+    return c;
+}
+fun void printaZebra(float zebra){
+    printLn zebra;
+}

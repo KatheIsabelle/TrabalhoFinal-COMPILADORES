@@ -13,7 +13,7 @@ public interface BelaConstants {
   /** RegularExpression Id. */
   int VAR = 6;
   /** RegularExpression Id. */
-  int FLOAT = 7;
+  int FLOAT_TYPE = 7;
   /** RegularExpression Id. */
   int BOOL = 8;
   /** RegularExpression Id. */
@@ -37,11 +37,11 @@ public interface BelaConstants {
   /** RegularExpression Id. */
   int RPAREN = 18;
   /** RegularExpression Id. */
-  int ACHAVES = 19;
+  int LBRACE = 19;
   /** RegularExpression Id. */
-  int FCHAVES = 20;
+  int RBRACE = 20;
   /** RegularExpression Id. */
-  int SEMICOLON = 21;
+  int SEMI = 21;
   /** RegularExpression Id. */
   int COMMA = 22;
   /** RegularExpression Id. */

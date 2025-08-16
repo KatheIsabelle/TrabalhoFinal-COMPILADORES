@@ -2,21 +2,45 @@ PARSER_BEGIN(Bela)
 import ast.*;
 import java.util.*;
 import java.io.*;
+import java.nio.file.Files; // 
+import java.nio.file.Paths; // 
 
 public class Bela {
   public static void main(String args[]) throws Exception {
-    FileInputStream fs = new FileInputStream(args[0]); 
+    FileInputStream fs = new FileInputStream(args[0]);
     Bela parser = new Bela(fs);
     Prog prog = parser.Bela(); // inicia a análise
     geraCodigo(prog, args[0]);
   }
 
-  public static void geraCodigo(Prog prog, String arquivo) throws IOException {
-    FileWriter fw = new FileWriter(arquivo.replace(".bela", ".java"));
+ public static void geraCodigo(Prog prog, String arquivo) throws IOException {
+    // Extrai o nome do arquivo sem a extensão (ex: "exemplo")
+    String nomeClasse = arquivo.substring(0, arquivo.lastIndexOf('.'));
+    
+    // Usa o nome extraído para criar o nome do arquivo .java
+    String nomeArquivoJava = nomeClasse + ".java";
+    FileWriter fw = new FileWriter(nomeArquivoJava);
     PrintWriter out = new PrintWriter(fw);
-    prog.gerarCodigo(out);
+    
+    // Passa o nome da classe para o método de geração de código da árvore
+    prog.gerarCodigo(out, nomeClasse);
+    
+    // Fecha o arquivo, garantindo que tudo foi salvo
     out.close();
+
+    // --- INÍCIO: Novo código para imprimir o arquivo no terminal ---
+
+    System.out.println("\n--- Código Gerado em '" + nomeArquivoJava + "' ---");
+    
+    // Lê todo o conteúdo do arquivo recém-criado para uma String
+    String conteudo = Files.readString(Paths.get(nomeArquivoJava));
+    
+    // Imprime o conteúdo no terminal
+    System.out.println(conteudo);
+    
+    // --- FIM: Novo código ---
   }
+  
 }
 PARSER_END(Bela)
 
@@ -25,51 +49,51 @@ SKIP : { " " | "\t" | "\n" | "\r" }
 
 
 TOKEN : {
-  // Palavras reservadas da linguagem com mensagem de debug para cada token reconhecido
-  < MAIN: "main" > 
-| < VAR: "var" > 
-| < FLOAT: "float" > 
-| < BOOL: "bool" > 
-| < VOID: "void" > 
-| < PRINTLN: "printLn" > 
-| < IF: "if" > 
-| < THEN: "then" > 
-| < WHILE: "while" > 
-| < RETURN: "return" > 
-| < READINPUT: "readInput" > 
-| < FUN: "fun" > 
+  // Palavras reservadas da linguagem
+  < MAIN: "main" >
+| < VAR: "var" >
+| < FLOAT_TYPE: "float" >
+| < BOOL: "bool" >
+| < VOID: "void" >
+| < PRINTLN: "printLn" >
+| < IF: "if" >
+| < THEN: "then" >
+| < WHILE: "while" >
+| < RETURN: "return" >
+| < READINPUT: "readInput" >
+| < FUN: "fun" >
 
-  // Símbolos da linguagem com mensagens de debug
-| < LPAREN: "(" > 
-| < RPAREN: ")" > 
-| < ACHAVES: "{" > 
-| < FCHAVES: "}" > 
-| < SEMICOLON: ";" > 
-| < COMMA: "," > 
-| < ASSIGN: "=" > 
+  // Símbolos da linguagem
+| < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < SEMI: ";" >
+| < COMMA: "," >
+| < ASSIGN: "=" >
 
-  // Operadores com mensagens de debug
-| < PLUS: "+" > 
-| < MINUS: "-" > 
-| < MULT: "*" > 
-| < DIV: "/" > 
-| < AND: "&&" > 
-| < OR: "||" > 
-| < LT: "<" > 
-| < GT: ">" > 
-| < EQ: "==" > 
+  // Operadores
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < MULT: "*" >
+| < DIV: "/" >
+| < AND: "&&" >
+| < OR: "||" >
+| < LT: "<" >
+| < GT: ">" >
+| < EQ: "==" >
 
   // Valores booleanos literais
-| < TRUE: "true" > 
-| < FALSE: "false" > 
+| < TRUE: "true" >
+| < FALSE: "false" >
 }
 
 TOKEN : {
-  // Identificadores que começam com letra, podem ter letras, dígitos e sublinhado (seguido de letras/dígitos)
-  < ID: (["a"-"z","A"-"Z"]) (["a"-"z","A"-"Z","0"-"9"])* ( "_" (["a"-"z","A"-"Z","0"-"9"])+ )? > //{ System.out.println("Identificador: " + image); }
-  
-  // Literais numéricos inteiros ou com ponto decimal e notação científica
-| < NUM: (["0"-"9"])+ ("."(["0"-"9"])+)? (("e"|"E") (("+"|"-")? (["0"-"9"])+))? > //{ System.out.println("Número: " + image); }
+  // Identificadores
+  < ID: (["a"-"z","A"-"Z"]) (["a"-"z","A"-"Z","0"-"9"])* ( "_" (["a"-"z","A"-"Z","0"-"9"])+ )? >
+
+  // Literais numéricos
+| < NUM: (["0"-"9"])+ ("."(["0"-"9"])+)? (("e"|"E") (("+"|"-")? (["0"-"9"])+))? >
 }
 
 
@@ -77,10 +101,11 @@ Prog Bela():
 {
   ArrayList<Fun> funs = new ArrayList<Fun>();
   Main main;
+  Fun f;
 }
 {
-  (funs.add(funcao()))*
   main = blocoMain()
+  (f=funcao() { funs.add(f); })*
   {
     return new Prog(main, funs);
   }
@@ -88,14 +113,14 @@ Prog Bela():
 
 Fun funcao():
 {
-  String nome, tipo;
+  String tipo;
   ArrayList<ParamFormalFun> params;
   ArrayList<VarDecl> vars;
   ArrayList<Comando> cmds;
   Token id;
 }
 {
-  tipo = tipo() id=<ID> <LPAREN> params = parametros() <RPAREN>
+  <FUN> tipo = tipo() id=<ID> <LPAREN> params = parametros() <RPAREN>
   <LBRACE>
     vars = varDecls()
     cmds = comandos()
@@ -111,7 +136,7 @@ Main blocoMain():
   ArrayList<Comando> cmds;
 }
 {
-  <MAIN> <LBRACE>
+  <MAIN> <LPAREN> <RPAREN> <LBRACE>
     vars = varDecls()
     cmds = comandos()
   <RBRACE>
@@ -136,7 +161,7 @@ VarDecl varDecl():
   Token id;
 }
 {
-  tipo=tipo() id=<ID> <SEMI> { return new VarDecl(tipo, id.image); }
+  <VAR> tipo=tipo() id=<ID> <SEMI> { return new VarDecl(tipo, id.image); }
 }
 
 String tipo():
@@ -145,6 +170,8 @@ String tipo():
 }
 {
   t=<FLOAT_TYPE> { return "float"; }
+| t=<BOOL> { return "bool"; }
+| t=<VOID> { return "void"; }
 }
 
 ArrayList<ParamFormalFun> parametros():
@@ -153,7 +180,7 @@ ArrayList<ParamFormalFun> parametros():
   ParamFormalFun p;
 }
 {
-  (p=param() { lista.add(p); } ( <COMMA> p=param() { lista.add(p); } )*)?
+  (p=param() { lista.add(p); } (<COMMA> p=param() { lista.add(p); })*)?
   { return lista; }
 }
 
@@ -181,35 +208,43 @@ Comando comando():
   Token id;
   Exp e;
   ArrayList<Comando> bloco;
+  ArrayList<Exp> args;
 }
 {
-  <PRINT> e=expressao() <SEMI> {
+  <PRINTLN> e=expressao() <SEMI> {
     return new CPrint(e);
-  }
-|
-  id=<ID> <ASSIGN> e=expressao() <SEMI> {
-    return new CAtribuicao(id.beginLine, id.image, e);
-  }
-|
-  <READ> id=<ID> <SEMI> {
-    return new CReadInput(id.image);
   }
 |
   <RETURN> e=expressao() <SEMI> {
     return new CReturn(e);
   }
 |
-  <IF> <LPAREN> e=expressao() <RPAREN> <LBRACE> bloco=comandos() <RBRACE> {
+  <IF> e=expressao() <THEN> <LBRACE> bloco=comandos() <RBRACE> {
     return new CIf(e, bloco);
   }
 |
-  <WHILE> <LPAREN> e=expressao() <RPAREN> <LBRACE> bloco=comandos() <RBRACE> {
+  <WHILE> e=expressao() <LBRACE> bloco=comandos() <RBRACE> {
     return new CWhile(e, bloco);
   }
 |
-  id=<ID> <LPAREN> (e=expressao() { ArrayList<Exp> args = new ArrayList<>(); args.add(e); }
-     (<COMMA> e=expressao() { args.add(e); })*)? <RPAREN> <SEMI> {
+  // ** A CORREÇÃO PRINCIPAL ESTÁ AQUI **
+  // Usamos LOOKAHEAD para diferenciar uma chamada de função de uma atribuição.
+  LOOKAHEAD( <ID> <LPAREN> )
+  id=<ID> <LPAREN> { args = new ArrayList<>(); }
+     (e=expressao() { args.add(e); } (<COMMA> e=expressao() { args.add(e); })*)?
+  <RPAREN> <SEMI> {
     return new CChamadaFun(id.image, args);
+  }
+|
+  // Regra para "id = readInput()"
+  LOOKAHEAD( <ID> <ASSIGN> <READINPUT> )
+  id=<ID> <ASSIGN> <READINPUT> <LPAREN> <RPAREN> <SEMI> {
+    return new CReadInput(id.image);
+  }
+|
+  // Regra para atribuição normal "id = expressao"
+  id=<ID> <ASSIGN> e=expressao() <SEMI> {
+    return new CAtribuicao(id.beginLine, id.image, e);
   }
 }
 
@@ -220,9 +255,36 @@ Exp expressao():
   Token op;
 }
 {
+  e1=expressaoLogica() (
+    op=<PLUS> e2=expressaoLogica() { e1 = new EOpExp(op.image, e1, e2); }
+  | op=<MINUS> e2=expressaoLogica() { e1 = new EOpExp(op.image, e1, e2); }
+  )*
+  { return e1; }
+}
+
+Exp expressaoLogica():
+{
+  Exp e1, e2;
+  Token op;
+}
+{
+  e1=expressaoRelacional() (
+    op=<AND> e2=expressaoRelacional() { e1 = new EOpExp(op.image, e1, e2); }
+  | op=<OR> e2=expressaoRelacional() { e1 = new EOpExp(op.image, e1, e2); }
+  )*
+  { return e1; }
+}
+
+Exp expressaoRelacional():
+{
+  Exp e1, e2;
+  Token op;
+}
+{
   e1=termo() (
-    op=<PLUS> e2=termo() { e1 = new EOpExp(op.image, e1, e2); }
-  | op=<MINUS> e2=termo() { e1 = new EOpExp(op.image, e1, e2); }
+    op=<LT> e2=termo() { e1 = new EOpExp(op.image, e1, e2); }
+  | op=<GT> e2=termo() { e1 = new EOpExp(op.image, e1, e2); }
+  | op=<EQ> e2=termo() { e1 = new EOpExp(op.image, e1, e2); }
   )*
   { return e1; }
 }
@@ -234,7 +296,7 @@ Exp termo():
 }
 {
   e1=fator() (
-    op=<MUL> e2=fator() { e1 = new EOpExp(op.image, e1, e2); }
+    op=<MULT> e2=fator() { e1 = new EOpExp(op.image, e1, e2); }
   | op=<DIV> e2=fator() { e1 = new EOpExp(op.image, e1, e2); }
   )*
   { return e1; }
@@ -244,19 +306,23 @@ Exp fator():
 {
   Token t;
   ArrayList<Exp> args = new ArrayList<>();
+  Exp e;
 }
 {
-  t=<FLOAT> { return new EFloat(Float.parseFloat(t.image)); }
+  t=<NUM> { return new EFloat(Float.parseFloat(t.image)); }
 |
   t=<TRUE>  { return new ETrue(); }
 |
   t=<FALSE> { return new EFalse(); }
 |
-  t=<ID> <LPAREN> (Exp e = expressao() { args.add(e); } (<COMMA> e=expressao() { args.add(e); })*)? <RPAREN> {
+  LOOKAHEAD( <ID> <LPAREN> )
+  t=<ID> <LPAREN> { args = new ArrayList<>(); }
+     (e=expressao() { args.add(e); } (<COMMA> e=expressao() { args.add(e); })*)?
+  <RPAREN> {
     return new EChamadaFun(t.image, args);
   }
 |
   t=<ID> { return new EVar(t.image); }
 |
-  <LPAREN> Exp e = expressao() <RPAREN> { return e; }
+  <LPAREN> e=expressao() <RPAREN> { return e; }
 }

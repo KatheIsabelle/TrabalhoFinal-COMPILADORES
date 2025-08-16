@@ -11,13 +11,19 @@ public class Prog {
         this.funs = funs;
     }
 
-    public void gerarCodigo(PrintWriter out) {
-        out.println("public class Gerado {");
+    // CORREÇÃO 1: A assinatura do método foi alterada para aceitar o nome da classe.
+    public void gerarCodigo(PrintWriter out, String nomeClasse) {
+        // CORREÇÃO 2: A variável nomeClasse é usada para gerar o nome correto.
+        out.println("public class " + nomeClasse + " {");
+        
         for (Fun f : funs)
             f.gerarCodigo(out);
-        out.println("public static void main(String[] args) {");
+            
+        out.println("    public static void main(String[] args) {");
+        
         main.gerarCodigo(out);
-        out.println("}");
+        
+        out.println("    }");
         out.println("}");
     }
 }

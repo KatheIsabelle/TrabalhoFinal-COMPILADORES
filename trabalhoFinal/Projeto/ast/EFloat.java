@@ -9,6 +9,6 @@ public class EFloat extends Exp {
     }
 
     public void gerarCodigo(PrintWriter out) {
-        out.print(value);
+        out.print(value + "f");
     }
 }
