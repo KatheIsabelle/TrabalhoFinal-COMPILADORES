@@ -10,7 +10,7 @@ public class Bela implements BelaConstants {
   public static void main(String args[]) throws Exception {
     FileInputStream fs = new FileInputStream(args[0]);
     Bela parser = new Bela(fs);
-    Prog prog = parser.Bela(); // inicia a análise
+    Prog prog = parser.Bela(); // inicia a análise, aponta para raiz da árvore
     geraCodigo(prog, args[0]);
   }
 
@@ -24,7 +24,7 @@ public class Bela implements BelaConstants {
     PrintWriter out = new PrintWriter(fw);
 
     // Passa o nome da classe para o método de geração de código da árvore
-    prog.gerarCodigo(out, nomeClasse);
+    prog.gerarCodigo(out, nomeClasse); // Aqui começa a cascata!
 
     // Fecha o arquivo, garantindo que tudo foi salvo
     out.close();

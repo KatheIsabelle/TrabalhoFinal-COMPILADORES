@@ -1,0 +1,15 @@
+Quando você executa o comando javacc Bela.jj, a ferramenta javacc lê o seu arquivo
+ de especificações (Bela.jj) e gera automaticamente um arquivo Java chamado 
+ Bela.java
+
+Então, a linha Bela parser = new Bela(fs); está criando uma instância da classe 
+Bela que foi gerada pelo javacc, ou seja, o seu parser.
+
+Fase de Análise (Parsing): O compilador lê seu código .bel, verifica se a sintaxe 
+está correta e, se estiver, constrói uma estrutura de dados em memória que 
+representa o seu programa. Essa estrutura é a Árvore Sintática Abstrata (AST).
+
+Fase de Síntese (Geração de Código): O compilador "caminha" pela árvore que ele 
+acabou de criar e, para cada "nó" da árvore, ele traduz e escreve o pedaço de 
+código Java correspondente em um novo arquivo .java.
+

@@ -13,12 +13,8 @@ public class ParamFormalFun {
         return var;
     }
 
-    public String getTipo() {
-        return tipo;
-    }
-
     // NOVO MÉTODO: Retorna o tipo pronto para o Java
-    public String getTipoJava() {
+    public String getTipo() {
         if (this.tipo.equals("bool")) {
             return "boolean";
         }

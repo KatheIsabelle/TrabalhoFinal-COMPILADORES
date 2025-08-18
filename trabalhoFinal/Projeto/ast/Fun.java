@@ -18,9 +18,10 @@ public class Fun {
     }
 
     public void gerarCodigo(PrintWriter out) {
+        if (retorno.equals("bool")) retorno = "boolean";
         out.print("static " + retorno + " " + nome + "(");
         for (int i = 0; i < params.size(); i++) {
-            out.print(params.get(i).getTipoJava() + " " + params.get(i).getVar());
+            out.print(params.get(i).getTipo() + " " + params.get(i).getVar());
             if (i < params.size() - 1) out.print(", ");
         }
         out.println(") {");

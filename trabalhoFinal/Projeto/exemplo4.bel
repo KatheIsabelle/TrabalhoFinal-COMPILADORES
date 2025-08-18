@@ -1,0 +1,33 @@
+
+main () {
+    var float numero_lido;
+    var float fator_secreto;
+    var bool eh_valido;
+
+    fator_secreto = 7;
+    eh_valido = false;
+
+    numero_lido = readInput();
+
+    eh_valido = numeroValido(numero_lido, fator_secreto);
+
+    imprimirStatus(eh_valido, (numero_lido * fator_secreto));
+}
+
+fun bool numeroValido(float num, float fator) {
+    var float resultado;
+    
+    resultado = (num * fator);
+
+    if ((resultado > 20) && ((resultado < 50) || (resultado == 77))) then {
+        return true;
+    }
+
+    return false;
+}
+
+fun void imprimirStatus(bool status, float valor) {
+    if (status) then {
+        printLn valor;
+    }
+}
